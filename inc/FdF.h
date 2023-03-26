@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FdF.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 00:09:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/25 22:03:28 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/26 16:30:27 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 # include "../libft/libft.h"
 # include "../MLX42/include/MLX42/MLX42.h"
 
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 1024
+#define HEIGHT 1024
 #define RED 0xFF0000FF
 #define YELLOW 0xFFFF00FF
 
@@ -70,9 +70,7 @@ typedef struct s_mlxinfo
 }				t_mlxinfo;
 
 void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *image, int32_t color);
-float	*ft_apply_rot(float **rotationMatrix, int *vertices);
-t_vec	*ft_apply_proj(float **projectionMatrix, float *rotatedPoints);
-void	cleanup(t_mlxinfo *info);
+void	cleanup(t_mlxinfo *info, char *msg);
 void	ft_connect_line(t_mlxinfo *info, t_list *head);
 float	**ft_calc_rot(t_mlxinfo *info);
 float	**ft_projection(t_mlxinfo *info);

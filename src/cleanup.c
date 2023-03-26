@@ -3,24 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/19 21:52:37 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/25 18:58:51 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/26 14:43:37 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "inc/FdF.h"
+#include "../inc/FdF.h"
 
-void	cleanup(t_mlxinfo *info)
+void	cleanup(t_mlxinfo *info, char *msg)
 {
 	t_list	*head;
 	int		**cont;
 	int		cntr;
 
+	head = info->matrices->object_points;
 	if (head)
 	{
-		head = info->matrices->object_points;
 		while (head->next)
 		{
 			cont = head->content;
@@ -36,5 +36,12 @@ void	cleanup(t_mlxinfo *info)
 		free(info->matrices);
 	if (info)
 		free(info);
-	exit(EXIT_FAILURE);
+	system("leaks fdf");
+	if (!msg)
+		exit(EXIT_SUCCESS);
+	else
+	{
+		perror(msg);
+		exit(EXIT_FAILURE);
+	}
 }

@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/19 21:38:39 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/26 01:39:46 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/26 16:30:42 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "inc/FdF.h"
+#include "../inc/FdF.h"
 
 void ft_clear_screen(void *param)
 {
 	mlx_image_t	*image;
 
 	image = param;
-	for (int32_t i = 0; i < image->width; ++i)
-		for (int32_t y = 0; y < image->height; ++y)
+	for (uint32_t i = 0; i < image->width; ++i)
+		for (uint32_t y = 0; y < image->height; ++y)
 			mlx_put_pixel(image, i, y, 0x000000FF);
 }
 
@@ -69,13 +69,13 @@ void ft_controls(void* param)
 	if (mlx_is_key_down(info->mlx, MLX_KEY_ESCAPE))
 		mlx_close_window(info->mlx);
 	if (mlx_is_key_down(info->mlx, MLX_KEY_UP))
-		info->image->instances[0].y -= 5;
+		info->pos_y -= 5;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_DOWN))
-		info->image->instances[0].y += 5;
+		info->pos_y += 5;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_LEFT))
-		info->image->instances[0].x -= 5;
+		info->pos_x -= 5;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_RIGHT))
-		info->image->instances[0].x += 5;
+		info->pos_x += 5;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_P))
 		info->scale += 0.1f;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_O) && info->scale > 0.1f)
@@ -104,7 +104,7 @@ int	ft_split_size(char **split)
 	return (cntr);
 }
 
-int	**ft_create_object(char **split, t_mlxinfo *mlxinfo, int index)
+int	**ft_create_object(char **split, t_mlxinfo *info, int index)
 {
 	int	cntr;
 	int	*point;
@@ -112,17 +112,16 @@ int	**ft_create_object(char **split, t_mlxinfo *mlxinfo, int index)
 	
 	cntr = ft_split_size(split) + 1;
 	ft_bzero(point_list = malloc(cntr*sizeof(int *)), cntr*sizeof(int *));
+	if (!point_list)
+			cleanup(info, "point list alloc fail");
 	cntr = 0;
 	while (split[cntr])
 	{
 		point = malloc(3*sizeof(int));
 		if (!point)
-		{
-			perror("point malloc error");
-			exit(EXIT_FAILURE);
-		}
+			cleanup(info, "3d point alloc fail");
 		point[0] = cntr * 10;
-		point[1] = ft_atoi(split[cntr]) * 10;
+		point[1] = ft_atoi(split[cntr]);
 		point[2] = index * 10;
 		point_list[cntr++] = point;
 	}
@@ -137,8 +136,9 @@ void	ft_read_input_file(char *path, t_mlxinfo *info)
 	int fd;
 	char *read;
 	int i;
-	t_list *head = info->matrices->object_points;
+	t_list *head;
 
+	head = info->matrices->object_points;
 	fd = open(path, O_RDONLY);
 	if (fd == -1)
 		exit(EXIT_FAILURE);
@@ -191,6 +191,32 @@ mlx_t	*ft_init_mlx(t_mlxinfo *info)
 // 		{ 0, 1, 0 },
 // 	};
 
+float	**ft_rm(t_mlxinfo *info)
+{
+	int		cntr;
+	float	**rm;
+
+	rm = malloc(3 * sizeof(float *));
+	if (!rm)
+		cleanup(info, "rm alloc fail");
+	cntr = 0;
+	while (cntr < 3)
+	{
+		rm[cntr] = malloc(3 * sizeof(float));
+		if (!rm[cntr])
+			cleanup(info, "rm cntr alloc fail");
+		cntr++;
+	}
+	return (rm);
+}
+
+void	ft_update_rot(void *param)
+{
+	t_mlxinfo	*info;
+	
+	info = param;
+	ft_calc_rot(info);
+}
 
 t_mlxinfo	*ft_init_info()
 {
@@ -198,19 +224,20 @@ t_mlxinfo	*ft_init_info()
 
 	info = malloc(sizeof(t_mlxinfo));
 	if (!info)
-		exit(EXIT_FAILURE);
+		cleanup(info, "info struct alloc fail");
 	info->matrices = malloc(sizeof(t_matrices));
 	if (!info->matrices)
-		exit(EXIT_FAILURE);
+		cleanup(info, "matrices struct alloc fail");
 	info->matrices->object_points = ft_lstnew(NULL);
 	info->scale = 2.f;
-	info->angle_x = 35.f;
-	info->angle_y = 45.f;
+	info->angle_x = 0.f;
+	info->angle_y = 0.f;
 	info->angle_z = 0.f;
-	info->pos_x = WIDTH/2-100; 
+	info->pos_x = WIDTH/2; 
 	info->pos_y = HEIGHT/2;
 	info->matrices->proj_mat = ft_projection(info);
-	info->matrices->curr_rot_mat = ft_calc_rot(info);
+	info->matrices->curr_rot_mat = ft_rm(info);
+	ft_update_rot(info);
 	return (info);
 }
 
@@ -219,17 +246,8 @@ void checkleaks()
 	system("leaks fdf");
 }
 
-void	ft_update_rot(void *param)
-{
-	t_mlxinfo	*info;
-	
-	info = param;
-	info->matrices->curr_rot_mat = ft_calc_rot(info);
-}
-
 int	main(int argc, const char* argv[])
 {
-	mlx_t *mlx;
 	t_mlxinfo	*info;
 
 	if (argc != 2)
@@ -239,17 +257,14 @@ int	main(int argc, const char* argv[])
 	}
 	info = ft_init_info();
 	info->mlx = ft_init_mlx(info);
-	
 	ft_read_input_file((char *)argv[1], info);
 	ft_printf("running\n");
 	mlx_loop_hook(info->mlx, ft_clear_screen, info->image);
 	mlx_loop_hook(info->mlx, ft_connect_mesh, info);
 	mlx_loop_hook(info->mlx, ft_controls, info);	
 	mlx_loop_hook(info->mlx, ft_update_rot, info);
-	
 	mlx_loop(info->mlx);
 	mlx_terminate(info->mlx);
-	cleanup(info);
-	// atexit(checkleaks);
+	cleanup(info, NULL);
 	return (EXIT_SUCCESS);
 }

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "inc/FdF.h"
+#include "../inc/FdF.h"
 
 int	step(int *err, int dir0, int dir1, int d_dir)
 {
@@ -31,8 +31,6 @@ void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *image, int32_t color)
 	int	err;
 	int	e2;
 
-	// printf("p0 plot: x:%f, y:%f\n", p0->x, p0->y);
-	// printf("p1 plot: x:%f, y:%f\n", p1->x, p1->y);
 	dx = abs ((int)p1->x - (int)p0->x);
 	dy = -abs ((int)p1->y - (int)p0->y);
 	err = dx + dy;
