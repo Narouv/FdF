@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   line->c                                             :+:      :+:    :+:   */
+/*   line.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student->42heilbronn->de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/19 19:09:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/25 19:56:10 by rnauke           ###   ########->fr       */
+/*   Created: 2023/03/28 20:44:41 by rnauke            #+#    #+#             */
+/*   Updated: 2023/03/28 20:45:54 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,25 @@ int	step(int *err, int dir0, int dir1, int d_dir)
 	return (dir0);
 }
 
-void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *image, int32_t color)
+uint32_t	ft_lc(uint32_t *c1, uint32_t c2, int dx, int dy)
+{
+	uint32_t	step;
+	int			d;
+
+	d = dx;
+	if (abs(dy) > dx)
+		d = abs(dy);
+	if (*c1 == c2)
+		return (*c1);
+	if (*c1 > c2)
+		step = *c1 - c2 / d;
+	else
+		step = c2 - *c1 / d;
+	*c1 += step;
+	return (*c1);
+}
+
+void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *i)
 {
 	int	dx;
 	int	dy;
@@ -36,8 +54,8 @@ void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *image, int32_t color)
 	err = dx + dy;
 	while (1)
 	{
-		if (p0->x > 1 && p0->y > 1 && p0->x < image->height && p0->y < image->width)
-			mlx_put_pixel (image, p0->x, p0->y, color);
+		if (p0->x > 1 && p0->y > 1 && p0->x < i->height && p0->y < i->width)
+			mlx_put_pixel (i, p0->x, p0->y, ft_lc(&(p0->c), p1->c, dx, dy));
 		if (p0->x == p1->x && p0->y == p1->y)
 			break ;
 		e2 = 2 * err;

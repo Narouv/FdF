@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/29 03:34:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/25 15:18:43 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/27 17:19:43 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,8 +77,5 @@ void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
 char	*get_next_line(int fd);
-char	*ft_char_realloc(char *ptr, size_t n);
-char	*ft_from_buffer(char *line, char *line_buffer, size_t *cntr);
-char	*ft_check_line(char *line, char *line_buffer);
-size_t	ft_check_nl(char *line);
+char	*ft_strjoinfr(char *s1, char *s2);
 #endif

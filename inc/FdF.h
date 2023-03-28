@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FdF.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 00:09:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/26 16:30:27 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/28 20:25:37 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,10 @@
 
 typedef struct s_vec
 {
-	float	x;
-	float	y;
-}			t_vec;
+	float		x;
+	float		y;
+	uint32_t	c;
+}				t_vec;
 
 /**
  * Struct contains all matrices needed for 3d projection.
@@ -67,9 +68,13 @@ typedef struct s_mlxinfo
 	float		angle_x;
 	float		angle_y;
 	float		angle_z;
+	int			fl;
+	int			p;
+	int			xmax;
+	int			ymax;
 }				t_mlxinfo;
 
-void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *image, int32_t color);
+void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *image);
 void	cleanup(t_mlxinfo *info, char *msg);
 void	ft_connect_line(t_mlxinfo *info, t_list *head);
 float	**ft_calc_rot(t_mlxinfo *info);

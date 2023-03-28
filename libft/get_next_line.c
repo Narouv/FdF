@@ -5,71 +5,98 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/10 15:53:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/19 21:09:30 by rnauke           ###   ########.fr       */
+/*   Created: 2022/11/02 17:35:29 by pgorner           #+#    #+#             */
+/*   Updated: 2023/03/27 17:20:28 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_check_nl(char *line)
+char	*ft_next(char *buf)
 {
-	size_t	cntr;
+	int		i;
+	int		j;
+	char	*res;
 
-	cntr = 0;
-	while (*(line + cntr))
-	{	
-		if (*(line + cntr) == '\n')
-		{
-			return (cntr + 1);
-		}
-		cntr++;
-	}
-	return (0);
-}
-
-char	*ft_from_buffer(char *line, char *l_buf, size_t *cntr)
-{
-	if (*l_buf)
+	i = 0;
+	while (buf[i] && buf[i] != '\n')
+		++i;
+	if (!buf[i])
 	{
-		ft_bzero(l_buf, ft_strlcpy(line, l_buf, ft_strlen(l_buf) + 1));
-		line = ft_char_realloc(line, BUFFER_SIZE);
-		*cntr = ft_strlen(line);
+		free(buf);
+		return (NULL);
 	}
-	return (line);
+	res = ft_calloc((ft_strlen(buf) - i + 1), sizeof(char));
+	if (!res)
+		return (NULL);
+	i++;
+	j = 0;
+	while (buf[i] != '\0')
+		res[j++] = buf[i++];
+	free(buf);
+	return (res);
 }
 
-char	*get_line(char *line, char *line_buf, size_t nl_pos)
+char	*ft_line(char *buf)
 {
-	ft_strlcpy(line_buf, line + nl_pos, ft_strlen(line + nl_pos) + 1);
-	*(line + nl_pos) = '\0';
-	return (line);
+	char	*res;
+	size_t	i;
+
+	i = 0;
+	if (!buf[i])
+		return (NULL);
+	while (buf[i] && buf[i] != '\n')
+		++i;
+	res = ft_calloc(i + 2, sizeof(char));
+	if (!res)
+		return (NULL);
+	i = 0;
+	while (buf[i] && buf[i] != '\n')
+	{
+		res[i] = buf[i];
+		++i;
+	}
+	if (buf[i] == '\n')
+		res[i] = '\n';
+	buf = res;
+	return (buf);
+}
+
+char	*ft_read(int fd, char *buf)
+{
+	char	*str;
+	int		byte;
+
+	if (!buf)
+		buf = ft_calloc(1, 1);
+	if (!buf)
+		return (NULL);
+	str = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	byte = 1;
+	while (byte >= 1)
+	{
+		ft_bzero(str, BUFFER_SIZE + 1);
+		byte = read(fd, str, BUFFER_SIZE);
+		if (byte == -1)
+			return (free(buf), free(str), NULL);
+		buf = ft_strjoinfr(buf, str);
+		if (ft_strchr(buf, '\n'))
+			break ;
+	}
+	return (free(str), buf);
 }
 
 char	*get_next_line(int fd)
 {
-	size_t		cntr;
 	char		*line;
-	static char	line_buf[10240][BUFFER_SIZE + 1];
-	ssize_t		bytes_read;
-	size_t		nl_pos;
+	static char	*buf;
 
-	if (fd < 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	cntr = 0;
-	bytes_read = 0;
-	ft_bzero(line = malloc(BUFFER_SIZE + 1), BUFFER_SIZE + 1);
-	line = ft_from_buffer(line, line_buf[fd], &cntr);
-	while (1)
-	{
-		nl_pos = ft_check_nl(line);
-		if (nl_pos)
-			return (get_line(line, line_buf[fd], nl_pos));
-		bytes_read = read(fd, line + cntr, BUFFER_SIZE);
-		if ((bytes_read < 1))
-			return (ft_check_line(line, line_buf[fd]));
-		*(line + cntr + bytes_read) = '\0';
-		cntr += bytes_read;
-		line = ft_char_realloc(line, BUFFER_SIZE + 1);
-	}
+	buf = ft_read(fd, buf);
+	if (!buf)
+		return (NULL);
+	line = ft_line(buf);
+	buf = ft_next(buf);
+	return (line);
 }

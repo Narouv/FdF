@@ -5,50 +5,29 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/10 15:53:27 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/21 19:03:26 by rnauke           ###   ########.fr       */
+/*   Created: 2022/11/02 17:36:10 by pgorner           #+#    #+#             */
+/*   Updated: 2023/03/27 17:19:19 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_char_realloc(char *ptr, size_t add	)
+char	*ft_strjoinfr(char *s1, char *s2)
 {
-	int		len;
-	char	*new_ptr;
+	char	*str;
+	size_t	i;
+	size_t	j;
 
-	len = ft_strlen(ptr);
-	new_ptr = malloc(len + add);
-	ft_strlcpy(new_ptr, ptr, len + add);
-	free(ptr);
-	ptr = NULL;
-	return (new_ptr);
-}
-
-char	*ft_check_line(char *line, char *l_buf)
-{
-	size_t	cntr;
-	size_t	len;
-
-	cntr = 0;
-	len = 0;
-	if (*line)
-	{
-		while (*(line + cntr))
-		{	
-			if (*(line + cntr) == '\n')
-			{
-				cntr++;
-				while (*(line + cntr) + len != '\0')
-					len++;
-				ft_strlcpy(l_buf, line + cntr, len + 1);
-				*(line + cntr) = '\0';
-				return (line);
-			}
-			cntr++;
-		}
-		return (line);
-	}
-	free(line);
-	return (NULL);
+	j = 0;
+	i = -1;
+	str = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	if (str == NULL)
+		return (NULL);
+	if (s1)
+		while (s1[++i] != '\0')
+			str[i] = s1[i];
+	while (s2[j] != '\0')
+		str[i++] = s2[j++];
+	str[ft_strlen(s1) + ft_strlen(s2)] = '\0';
+	return (free(s1), str);
 }

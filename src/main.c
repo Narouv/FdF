@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/19 21:38:39 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/26 16:30:42 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/28 20:28:39 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,14 @@ void	ft_connect_mesh(void *param)
 	}
 }
 
+void	ft_update_rot(void *param)
+{
+	t_mlxinfo	*info;
+	
+	info = param;
+	ft_calc_rot(info);
+}
+
 void ft_controls(void* param)
 {
 	t_mlxinfo *info;
@@ -77,21 +85,28 @@ void ft_controls(void* param)
 	if (mlx_is_key_down(info->mlx, MLX_KEY_RIGHT))
 		info->pos_x += 5;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_P))
-		info->scale += 0.1f;
-	if (mlx_is_key_down(info->mlx, MLX_KEY_O) && info->scale > 0.1f)
-		info->scale -= 0.1f;
-	if (mlx_is_key_down(info->mlx, MLX_KEY_W))
-		info->angle_y += .1f;
-	if (mlx_is_key_down(info->mlx, MLX_KEY_S))
-		info->angle_y -= .1f;
-	if (mlx_is_key_down(info->mlx, MLX_KEY_A))
-		info->angle_x += .1f;
+		info->scale *= 1.05f;
+	if (mlx_is_key_down(info->mlx, MLX_KEY_O) && info->scale > 0.01f)
+		info->scale *= 0.95f;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_D))
-		info->angle_x -= .1f;
+		info->angle_y += .05f;
+	if (mlx_is_key_down(info->mlx, MLX_KEY_A))
+		info->angle_y -= .05f;
+	if (mlx_is_key_down(info->mlx, MLX_KEY_S))
+		info->angle_x += .05f;
+	if (mlx_is_key_down(info->mlx, MLX_KEY_W))
+		info->angle_x -= .05f;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_Q))
-		info->angle_z += .1f;
+		info->angle_z += .05f;
 	if (mlx_is_key_down(info->mlx, MLX_KEY_E))
-		info->angle_z -= .1f;
+		info->angle_z -= .05f;
+	if (mlx_is_key_down(info->mlx, MLX_KEY_G) && info->fl > info->xmax)
+		info->fl -= 5;
+	if (mlx_is_key_down(info->mlx, MLX_KEY_F))
+		info->fl += 5;
+	if (mlx_is_key_down(info->mlx, MLX_KEY_M))
+		info->p = !info->p;
+	ft_update_rot((void *)info);
 }
 
 int	ft_split_size(char **split)
@@ -110,7 +125,9 @@ int	**ft_create_object(char **split, t_mlxinfo *info, int index)
 	int	*point;
 	int **point_list;
 	
-	cntr = ft_split_size(split) + 1;
+	cntr = ft_split_size(split);
+	info->xmax = cntr * 10;
+	info->fl = info->xmax * 1.5;
 	ft_bzero(point_list = malloc(cntr*sizeof(int *)), cntr*sizeof(int *));
 	if (!point_list)
 			cleanup(info, "point list alloc fail");
@@ -123,25 +140,26 @@ int	**ft_create_object(char **split, t_mlxinfo *info, int index)
 		point[0] = cntr * 10;
 		point[1] = ft_atoi(split[cntr]);
 		point[2] = index * 10;
+		if (point[1] > 0)
+			point[3] = 0x00000FFFF;
+		else
+			point[3] = 0xFFFFFFFF;
 		point_list[cntr++] = point;
 	}
 	point_list[cntr] = NULL;
-	while (cntr > -1)
+	while (cntr >= 0)
 		free(split[cntr--]);
+	free(split);
 	return (point_list);
 }
 
-void	ft_read_input_file(char *path, t_mlxinfo *info)
+void	ft_read_input_file(int fd, t_mlxinfo *info)
 {
-	int fd;
 	char *read;
 	int i;
 	t_list *head;
 
 	head = info->matrices->object_points;
-	fd = open(path, O_RDONLY);
-	if (fd == -1)
-		exit(EXIT_FAILURE);
 	i = 0;
 	read = get_next_line(fd);
 	while (read)
@@ -153,12 +171,14 @@ void	ft_read_input_file(char *path, t_mlxinfo *info)
 	}
 	free(read);
 	info->matrices->object_points = head;
+	info->ymax = i;
 }
 
 mlx_t	*ft_init_mlx(t_mlxinfo *info)
 {
 	mlx_t				*mlx;
 	static mlx_image_t	*image;
+
 	if (!(mlx = mlx_init(WIDTH, HEIGHT, "FdF", true)))
 	{
 		puts(mlx_strerror(mlx_errno));
@@ -171,7 +191,8 @@ mlx_t	*ft_init_mlx(t_mlxinfo *info)
 		exit(EXIT_FAILURE);
 	}
 	info->image = image;
-	if (mlx_image_to_window(mlx, info->image, 0, 0) == -1)
+	// mlx image to window creates ROOT CYCLE leak ?
+	if (mlx_image_to_window(mlx, image, 0, 0) == -1)
 	{
 		mlx_close_window(mlx);
 		puts(mlx_strerror(mlx_errno));
@@ -179,17 +200,6 @@ mlx_t	*ft_init_mlx(t_mlxinfo *info)
 	}
 	return (mlx);
 }
-
-// float iso_matrix[3][3] = {
-// 		{ cos(45), 0, -sin(45) },
-// 		{ -0.55237, -0.76065, -0.34101 },
-// 		{ -0.64724, 0.64916, -0.39958 }
-// 	};
-
-// 	float proj_matrix[2][3] = { 
-// 		{ 1, 0, 0 },
-// 		{ 0, 1, 0 },
-// 	};
 
 float	**ft_rm(t_mlxinfo *info)
 {
@@ -210,13 +220,7 @@ float	**ft_rm(t_mlxinfo *info)
 	return (rm);
 }
 
-void	ft_update_rot(void *param)
-{
-	t_mlxinfo	*info;
-	
-	info = param;
-	ft_calc_rot(info);
-}
+
 
 t_mlxinfo	*ft_init_info()
 {
@@ -229,14 +233,18 @@ t_mlxinfo	*ft_init_info()
 	if (!info->matrices)
 		cleanup(info, "matrices struct alloc fail");
 	info->matrices->object_points = ft_lstnew(NULL);
-	info->scale = 2.f;
-	info->angle_x = 0.f;
-	info->angle_y = 0.f;
-	info->angle_z = 0.f;
+	info->scale = 3.f;
+	info->angle_x = 3.6f;
+	info->angle_y = .4f;
+	info->angle_z = 0.1f;
 	info->pos_x = WIDTH/2; 
 	info->pos_y = HEIGHT/2;
 	info->matrices->proj_mat = ft_projection(info);
 	info->matrices->curr_rot_mat = ft_rm(info);
+	info->fl = 500;
+	info->p = 0;
+	info->xmax = 0;
+	info->ymax = 0;
 	ft_update_rot(info);
 	return (info);
 }
@@ -249,20 +257,22 @@ void checkleaks()
 int	main(int argc, const char* argv[])
 {
 	t_mlxinfo	*info;
+	int			fd;
 
 	if (argc != 2)
 	{
 		ft_printf("Usage: ./fdf <.fdf file path>");
 		exit(EXIT_FAILURE);
 	}
+	fd = open(argv[1], O_RDONLY);
 	info = ft_init_info();
 	info->mlx = ft_init_mlx(info);
-	ft_read_input_file((char *)argv[1], info);
+	ft_read_input_file(fd, info);
+	close(fd);
 	ft_printf("running\n");
 	mlx_loop_hook(info->mlx, ft_clear_screen, info->image);
 	mlx_loop_hook(info->mlx, ft_connect_mesh, info);
-	mlx_loop_hook(info->mlx, ft_controls, info);	
-	mlx_loop_hook(info->mlx, ft_update_rot, info);
+	mlx_loop_hook(info->mlx, ft_controls, info);
 	mlx_loop(info->mlx);
 	mlx_terminate(info->mlx);
 	cleanup(info, NULL);

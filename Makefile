@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+         #
+#    By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/19 17:59:41 by rnauke            #+#    #+#              #
-#    Updated: 2023/03/26 16:28:07 by rnauke           ###   ########.fr        #
+#    Updated: 2023/03/28 15:06:06 by rnauke           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,8 +28,9 @@ OBJECTS = $(SOURCES:.c=.o)
 DIR_SRC = $(addprefix $(SOURCES_DIR)/, $(SOURCES))
 DIR_OBJ = $(addprefix $(OBJECTS_DIR)/, $(OBJECTS))
 
-FLAGS = -Wall -Werror -Wextra #-fsanitize=address -g
+FLAGS = #-Wall -Werror -Wextra #-fsanitize=address -g
 INCLUDES = -Iinclude -lglfw -L"/Users/$(USER)/.brew/opt/glfw/lib/"
+#INCLUDES = -Iinclude -lglfw -L\"/opt/homebrew/Cellar/glfw/3.3.8/lib/\"
 ARGS = $(LIBFT) $(MLX42) $(INCLUDES) $(FLAGS)
 all:  $(NAME)
 
