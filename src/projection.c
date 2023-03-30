@@ -6,63 +6,11 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 20:17:38 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/28 20:25:44 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/29 16:19:30 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/FdF.h"
-
-float	*ft_apply_rot(t_mlxinfo *info, float **rotationMatrix, int *vertex)
-{
-	float	*result;
-	int		cc;
-
-	ft_bzero(result = malloc(sizeof(4 * sizeof(float))), 4 * sizeof(float));
-	if (!result)
-		cleanup(info, "apply rot alloc fail");
-	cc = 0;
-	while (cc < 3)
-	{
-		result[0] += rotationMatrix[0][cc] * vertex[cc];
-		result[1] += rotationMatrix[1][cc] * vertex[cc];
-		result[2] += rotationMatrix[2][cc] * vertex[cc];
-		cc++;
-	}
-	result[3] = vertex[3];
-	return (result);
-}
-
-t_vec	*ft_apply_wp(t_mlxinfo *info, float *rotatedPoints)
-{
-	t_vec	*result;
-
-	ft_bzero(result = malloc(sizeof(t_vec)), sizeof(t_vec));
-	if (!result)
-		cleanup(info, "apply rot alloc fail");
-	result->x = (info->fl * rotatedPoints[0]) / (info->fl + rotatedPoints[2]);
-	result->y = (info->fl * rotatedPoints[1]) / (info->fl + rotatedPoints[2]);
-	result->c = rotatedPoints[3];
-	return (result);
-}
-
-t_vec	*ft_apply_proj(t_mlxinfo *info, float **pm, float *rp)
-{
-	t_vec	*result;
-	int		cc;
-
-	ft_bzero(result = malloc(sizeof(t_vec)), sizeof(t_vec));
-	if (!result)
-		cleanup(info, "apply rot alloc fail");
-	cc = 0;
-	while (cc < 3)
-	{
-		result->x += pm[0][cc] * rp[cc];
-		result->y += pm[1][cc] * rp[cc];
-		cc++;
-	}
-	result->c = rp[3];
-	return (result);
-}
 
 void	ft_transform_point(t_vec *point, t_mlxinfo *info)
 {
@@ -98,7 +46,7 @@ void	ft_verify_points(t_mlxinfo *info, int *cont, int *cont2)
 {
 	t_vec	*one;
 	t_vec	*two;
-	
+
 	one = ft_calc_point(info, cont);
 	two = ft_calc_point(info, cont2);
 	ft_plot_line(one, two, info->image);
@@ -111,8 +59,6 @@ void	ft_connect_line(t_mlxinfo *info, t_list *head)
 	int		**cont;
 	int		**cont2;
 	int		cntr;
-	t_vec	*one;
-	t_vec	*two;
 
 	cont = head->content;
 	cntr = 0;
@@ -129,8 +75,6 @@ void	ft_connect_line(t_mlxinfo *info, t_list *head)
 		cntr++;
 	}
 }
-
-//why is zoom in so snappy?
 
 float	**ft_projection(t_mlxinfo *info)
 {

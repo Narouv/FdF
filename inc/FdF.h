@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 00:09:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/28 20:25:37 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/29 17:04:24 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,10 +74,31 @@ typedef struct s_mlxinfo
 	int			ymax;
 }				t_mlxinfo;
 
+// matrix.c
+t_vec	*ft_apply_proj(t_mlxinfo *info, float **pm, float *rp);
+t_vec	*ft_apply_wp(t_mlxinfo *info, float *rotatedPoints);
+float	*ft_apply_rot(t_mlxinfo *info, float **rotationMatrix, int *vertex);
+
+// line.c
 void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *image);
+
+// cleanup.c
 void	cleanup(t_mlxinfo *info, char *msg);
+
+// projection.c
 void	ft_connect_line(t_mlxinfo *info, t_list *head);
 float	**ft_calc_rot(t_mlxinfo *info);
 float	**ft_projection(t_mlxinfo *info);
+
+// control.c
+void	ft_controls(void *param);
+void	ft_rot_control(t_mlxinfo *info);
+void	ft_zoom(t_mlxinfo *info);
+void	ft_shmovin(t_mlxinfo *info);
+
+void	ft_update_rot(void *param);
+int		**ft_co(char **split, t_mlxinfo *info, int index);
+void	ft_read_input_file(int fd, t_mlxinfo *info);
+void	ft_connect_mesh(void *param);
 
 #endif
