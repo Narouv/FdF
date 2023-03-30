@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 00:09:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/30 16:20:48 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/30 17:07:34 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@
 # include "../libft/libft.h"
 # include "../MLX42/include/MLX42/MLX42.h"
 
-#define WIDTH 1024
-#define HEIGHT 1024
+# define WIDTH 1024
+# define HEIGHT 1024
 
 typedef struct s_vec
 {
