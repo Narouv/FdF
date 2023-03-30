@@ -6,7 +6,7 @@
 /*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/30 16:15:10 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/30 16:24:03 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/30 17:05:18 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,5 +91,4 @@ void	ft_read_input_file(int fd, t_mlxinfo *info)
 	free(read);
 	info->matrices->object_points = head;
 	info->ymax = i;
-	// info->scale = HEIGHT / info->ymax / 5.f;
 }
