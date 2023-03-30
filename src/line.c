@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   line.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:44:41 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/29 19:22:52 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:55:24 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	ft_plot_line(t_vec *p0, t_vec *p1, mlx_image_t *i)
 	err = dx + dy;
 	while (1)
 	{
-		if (p0->x > 1 && p0->y > 1 && p0->x < i->height && p0->y < i->width)
+		if (p0->x > 1 && p0->y > 1 && p0->x < i->width && p0->y < i->height)
 			mlx_put_pixel (i, p0->x, p0->y, p1->c);
 		if (p0->x == p1->x && p0->y == p1->y)
 			break ;

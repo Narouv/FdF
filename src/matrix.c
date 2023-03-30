@@ -3,21 +3,34 @@
 /*                                                        :::      ::::::::   */
 /*   matrix.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/29 16:19:03 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/29 16:19:40 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:58:45 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/FdF.h"
+
+int	ft_split_size(char **split, t_mlxinfo *info)
+{
+	int	cntr;
+
+	cntr = 0;
+	while (split[cntr])
+		cntr++;
+	info->xmax = cntr * 10;
+	info->fl = info->xmax * 3;
+	info->pos_x = 50 + (info->xmax % (WIDTH / 4));
+	return (cntr);
+}
 
 float	*ft_apply_rot(t_mlxinfo *info, float **rotationMatrix, int *vertex)
 {
 	float	*result;
 	int		cc;
 
-	ft_bzero(result = malloc(sizeof(4 * sizeof(float))), 4 * sizeof(float));
+	ft_bzero(result = malloc(4 * sizeof(float)), 4 * sizeof(float));
 	if (!result)
 		cleanup(info, "apply rot alloc fail");
 	cc = 0;

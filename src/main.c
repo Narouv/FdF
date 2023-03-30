@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/19 21:38:39 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/29 19:38:22 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:51:21 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,109 +47,6 @@ void	ft_connect_mesh(void *param)
 	}
 }
 
-void	ft_update_rot(void *param)
-{
-	t_mlxinfo	*info;
-
-	info = param;
-	ft_calc_rot(info);
-}
-
-int	ft_split_size(char **split, t_mlxinfo *info)
-{
-	int	cntr;
-
-	cntr = 0;
-	while (split[cntr])
-		cntr++;
-	info->xmax = cntr * 10;
-	info->fl = info->xmax * 1.5;
-	info->pos_x = 50 + (info->xmax % (WIDTH / 4));
-	return (cntr);
-}
-
-uint32_t	hex2int(char *hex)
-{
-	uint32_t	val;
-	uint8_t		byte;
-
-	val = 0;
-	while (*hex)
-	{
-		byte = *hex++;
-		if (byte >= '0' && byte <= '9')
-			byte = byte - '0';
-		else if (byte >= 'a' && byte <= 'f')
-			byte = byte - 'a' + 10;
-		else if (byte >= 'A' && byte <= 'F')
-			byte = byte - 'A' + 10;
-		val = (val << 4) | (byte & 0xF);
-	}
-	return (val);
-}
-
-int	ft_get_color(char *s)
-{
-	char	*c;
-	
-	c = ft_strchr(s, ',');
-	if (c)
-		return ((hex2int(c + 3) << 8) + 0xFF);
-	else
-		return (0xFFFFFFFF);
-}
-
-int	**ft_co(char **split, t_mlxinfo *info, int index)
-{
-	int	cntr;
-	int	*point;
-	int	**point_list;
-
-	cntr = ft_split_size(split, info);
-	point_list = malloc(cntr * sizeof(int *));
-	if (!point_list)
-		cleanup(info, "point list alloc fail");
-	cntr = 0;
-	while (split[cntr])
-	{
-		point = malloc(4 * sizeof(int));
-		if (!point)
-			cleanup(info, "3d point alloc fail");
-		point[0] = cntr * 10;
-		point[1] = ft_atoi(split[cntr]);
-		point[2] = index * 10;
-		point[3] = ft_get_color(split[cntr]);
-		point_list[cntr++] = point;
-	}
-	point_list[cntr] = NULL;
-	while (cntr >= 0)
-		free(split[cntr--]);
-	free(split);
-	return (point_list);
-}
-
-void	ft_read_input_file(int fd, t_mlxinfo *info)
-{
-	char	*read;
-	int		i;
-	t_list	*head;
-
-	head = info->matrices->object_points;
-	i = 0;
-	read = get_next_line(fd);
-	while (read)
-	{
-		ft_lstadd_front(&head, ft_lstnew(ft_co(ft_split(read, ' '), info, i)));
-		free(read);
-		i++;
-		read = get_next_line(fd);
-	}
-	free(read);
-	info->matrices->object_points = head;
-	info->ymax = i;
-	info->scale = HEIGHT / info->ymax / 10.f;
-}
-
 mlx_t	*ft_init_mlx(t_mlxinfo *info)
 {
 	mlx_t				*mlx;
@@ -169,7 +66,6 @@ mlx_t	*ft_init_mlx(t_mlxinfo *info)
 		exit(EXIT_FAILURE);
 	}
 	info->image = image;
-	// mlx image to window creates ROOT CYCLE leak ?
 	if (mlx_image_to_window(mlx, image, 0, 0) == -1)
 	{
 		mlx_close_window(mlx);
@@ -177,25 +73,6 @@ mlx_t	*ft_init_mlx(t_mlxinfo *info)
 		exit(EXIT_FAILURE);
 	}
 	return (mlx);
-}
-
-float	**ft_rm(t_mlxinfo *info)
-{
-	int		cntr;
-	float	**rm;
-
-	rm = malloc(3 * sizeof(float *));
-	if (!rm)
-		cleanup(info, "rm alloc fail");
-	cntr = 0;
-	while (cntr < 3)
-	{
-		rm[cntr] = malloc(3 * sizeof(float));
-		if (!rm[cntr])
-			cleanup(info, "rm cntr alloc fail");
-		cntr++;
-	}
-	return (rm);
 }
 
 t_mlxinfo	*ft_init_info(void)
@@ -236,14 +113,16 @@ int	main(int argc, const char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	fd = open(argv[1], O_RDONLY);
+	if (fd == -1)
+	{
+		ft_printf("enter valid file");
+		exit(EXIT_FAILURE);
+	}
 	info = ft_init_info();
 	info->mlx = ft_init_mlx(info);
 	ft_read_input_file(fd, info);
 	close(fd);
-	ft_printf("running\n");
 	ft_connect_mesh(info);
-	// mlx_loop_hook(info->mlx, ft_clear_screen, info->image);
-	// mlx_loop_hook(info->mlx, ft_connect_mesh, info);
 	mlx_loop_hook(info->mlx, ft_controls, info);
 	mlx_loop(info->mlx);
 	mlx_terminate(info->mlx);

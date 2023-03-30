@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+         #
+#    By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/07/27 14:34:21 by rnauke            #+#    #+#              #
-#    Updated: 2023/03/19 21:15:03 by rnauke           ###   ########.fr        #
+#    Updated: 2023/03/30 16:45:56 by rnauke           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,12 +33,12 @@ all: ${NAME}
 bonus: $(NAME) $(OBJECTS_BONUS)
 
 ${NAME}: $(PRINTF_OBJECT_DIR)
-	gcc -c $(SOURCES) $(FLAGS)
-	ar -vcrs ${NAME} $(OBJECTS) $(PRINTF_OBJECT_DIR)
+	gcc -c $(FLAGS) $(SOURCES) 
+	ar -vrcs ${NAME} $(OBJECTS) $(PRINTF_OBJECT_DIR)
 
 $(OBJECTS_BONUS):
-	gcc -c $(SOURCES_BONUS) $(FLAGS)
-	ar -vcrs ${NAME} $(OBJECTS_BONUS)
+	gcc -c  $(FLAGS) $(SOURCES_BONUS)
+	ar -vrcs ${NAME} $(OBJECTS_BONUS)
 
 $(PRINTF_DIR)/%.o:
 	gcc -c $(addprefix $(PRINTF_DIR), $(PRINTF_SOURCES)) $(FLAGS)

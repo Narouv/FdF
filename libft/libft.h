@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rnauke <rnauke@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: rnauke <rnauke@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/29 03:34:29 by rnauke            #+#    #+#             */
-/*   Updated: 2023/03/27 17:19:43 by rnauke           ###   ########.fr       */
+/*   Updated: 2023/03/30 16:12:04 by rnauke           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 # include <unistd.h>
 # include "ft_printf/ft_printf.h"
 
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE 10000
-#endif
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 10000
+# endif
 
 typedef struct s_list
 {
